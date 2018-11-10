@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/cat.dart';
-import 'dart:math';
+//import 'dart:math';
 
 class Home extends StatefulWidget {
   HomeState createState() => HomeState();
@@ -9,9 +9,32 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> with TickerProviderStateMixin {
   Animation<double> catAnimation;
   AnimationController catController;
+  Animation<double> boxAnimation;
+  AnimationController boxController;
 
   initState() {
     super.initState();
+
+    boxController = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+
+    boxAnimation = Tween(begin: 0.0, end: 3.14).animate(
+      CurvedAnimation(
+        parent: boxController,
+        curve: Curves.linear,
+      ),
+    );
+
+    boxAnimation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        boxController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        boxController.forward();
+      }
+    });
+    boxController.forward();
 
     catController = AnimationController(
       duration: Duration(milliseconds: 300),
@@ -45,49 +68,58 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
               children: [
                 buildCatAnimation(catAnimation),
                 buildBox(),
-                buildLeftFlat(),
+                buildLeftFlat(boxAnimation),
               ],
             ),
           ),
           onTap: onTap,
         ));
   }
-}
 
-Widget buildCatAnimation(Animation catAnimation) {
-  return AnimatedBuilder(
-    animation: catAnimation,
-    builder: (context, child) {
-      return Positioned(
-        child: child,
-        bottom: catAnimation.value,
-        right: 0.0,
-        left: 0.0,
-      );
-    },
-    child: Cat(),
-  );
-}
+  Widget buildCatAnimation(Animation catAnimation) {
+    return AnimatedBuilder(
+      animation: catAnimation,
+      builder: (context, child) {
+        return Positioned(
+          child: child,
+          bottom: catAnimation.value,
+          right: 0.0,
+          left: 0.0,
+        );
+      },
+      child: Cat(),
+    );
+  }
 
-Widget buildBox() {
-  return Container(
-    height: 200.0,
-    width: 200.0,
-    color: Colors.brown,
-  );
-}
+  Widget buildBox() {
+    return Container(
+      height: 200.0,
+      width: 200.0,
+      color: Colors.brown,
+    );
+  }
 
-Widget buildLeftFlat() {
-  return Positioned(
-    left: 3.0,
-    child: Transform.rotate(
-      child: Container(
-        height: 10.0,
-        width: 125.0,
-        color: Colors.brown,
-      ),
-      angle: pi * 0.6,
-      alignment: Alignment.topLeft,
-    ),
-  );
+  Widget buildLeftFlat(Animation boxAnimation) {
+    return Positioned(
+      left: 3.0,
+      child: AnimatedBuilder(
+          animation: boxAnimation,
+          child: Container(
+            height: 10.0,
+            width: 125.0,
+            color: Colors.brown,
+          ),
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: boxAnimation.value,
+              alignment: Alignment.topLeft,
+              child: Container(
+                decoration: new BoxDecoration(
+                  color: new Color(0xFF005CA9),
+                ),
+              ),
+            );
+          }),
+    );
+  }
 }
