@@ -114,9 +114,7 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
               angle: boxAnimation.value,
               alignment: Alignment.topLeft,
               child: Container(
-                decoration: new BoxDecoration(
-                  color: new Color(0xFF005CA9),
-                ),
+                
               ),
             );
           }),
